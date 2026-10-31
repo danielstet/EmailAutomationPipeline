@@ -1,0 +1,31 @@
+site_name: Email Automation Pipeline
+site_description: Local mail server + LangGraph/LangChain/Ollama pipeline for automated email triage
+repo_url: https://github.com/danielstet/EmailAutomationPipeline
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Mail Server:
+      - Getting Started: mail-server/getting-started.md
+      - Accounts & Webmail: mail-server/accounts-and-webmail.md
+      - Architecture Notes: mail-server/architecture-notes.md
+  - Pipeline:
+      - Overview: pipeline/overview.md
