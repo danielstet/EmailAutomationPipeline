@@ -74,6 +74,8 @@ never reuse this anywhere real):
 | `sales@localmail.test` | Fake department |
 | `support@localmail.test` | Fake department |
 | `billing@localmail.test` | Fake department |
+| `hr@localmail.test` | Fake department |
+| `marketing@localmail.test` | Fake department |
 
 Add more: `docker exec mailserver setup email add newuser@localmail.test 'TestPass123!'`
 
