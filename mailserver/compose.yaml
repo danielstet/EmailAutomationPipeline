@@ -26,6 +26,37 @@ services:
       - mail-state:/var/mail-state/
     restart: unless-stopped
     stop_grace_period: 1m
+    networks:
+      default:
+        # So other containers (e.g. roundcube) can reach this server by the
+        # exact hostname our self-signed cert's SAN covers. Connecting via
+        # the plain service name "mailserver" instead would fail TLS
+        # hostname verification.
+        aliases:
+          - mail.localmail.test
+
+  roundcube:
+    image: roundcube/roundcubemail:latest
+    container_name: roundcube
+    depends_on:
+      - mailserver
+    environment:
+      - ROUNDCUBEMAIL_DEFAULT_HOST=tls://mail.localmail.test
+      - ROUNDCUBEMAIL_DEFAULT_PORT=143
+      - ROUNDCUBEMAIL_SMTP_SERVER=tls://mail.localmail.test
+      - ROUNDCUBEMAIL_SMTP_PORT=587
+      # Self-signed CA, not a public one — ignore cert warnings, this is a
+      # LAN-only test rig.
+      - ROUNDCUBEMAIL_SKIN=elastic
+    ports:
+      - "8080:80"
+    volumes:
+      # Persists Roundcube's own SQLite DB (saved settings, address book —
+      # not mail itself, that always lives on the mailserver).
+      - ./docker-data/roundcube/db/:/var/roundcube/db/
+      # Skip TLS peer verification against our self-signed cert (see file).
+      - ./docker-data/roundcube/config/:/var/roundcube/config/
+    restart: unless-stopped
 
 volumes:
   mail-state:

@@ -7,3 +7,7 @@ docker-data/dms/mail-logs/
 docker-data/dms/config/ssl/
 docker-data/dms/custom-certs/*.pem
 docker-data/dms/custom-certs/demoCA/
+
+# Roundcube's own generated SQLite settings DB — regenerates on first run,
+# not something to version control.
+docker-data/roundcube/db/

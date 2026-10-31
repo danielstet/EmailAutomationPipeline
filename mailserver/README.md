@@ -79,6 +79,20 @@ never reuse this anywhere real):
 
 Add more: `docker exec mailserver setup email add newuser@localmail.test 'TestPass123!'`
 
+## Webmail UI (Roundcube)
+
+A browser-based inbox for actually looking at mail, instead of only
+scripting IMAP: **http://localhost:8080**, log in with any address above
+(e.g. `inbox@localmail.test` / `TestPass123!`).
+
+It connects to the mailserver container over the internal Docker network as
+`mail.localmail.test` (a network alias on the `mailserver` service matching
+the cert's hostname) with TLS peer verification disabled
+(`docker-data/roundcube/config/tls.inc.php`) — necessary because the cert is
+self-signed by our own throwaway local CA, not a publicly trusted one. Its
+own SQLite settings database lives in `docker-data/roundcube/db/`
+(gitignored — regenerates itself on first run, nothing to set up).
+
 ## Ports
 
 | Port | Purpose |
