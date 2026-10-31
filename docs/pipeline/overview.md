@@ -19,6 +19,31 @@ flow:
 4. [LangSmith](https://www.langchain.com/langsmith) traces the run for
    debugging/evaluation.
 
+```mermaid
+flowchart TD
+    A[Triage inbox: inbox@localmail.test] -->|IMAP fetch| B[Read node]
+    B --> C[LangChain chain]
+    C -->|prompt| D[Ollama model]
+    D -->|classification| C
+    C --> E{Route on response}
+    E -->|billing| F[Move to billing@]
+    E -->|sales| G[Move to sales@]
+    E -->|support| H[Move to support@]
+    E -->|hr| I[Move to hr@]
+    E -->|marketing| J[Move to marketing@]
+    E -->|needs reply| K[Draft reply node]
+    K --> L[LangChain chain]
+    L -->|prompt| D
+    L --> M[Send via SMTP]
+    E -->|unclear| N[Escalate / flag for human review]
+
+    classDef mail fill:#2962ff,color:#fff,stroke:none;
+    class A,F,G,H,I,J,M mail;
+```
+
+Every node transition and every Ollama call is traced in LangSmith, so a
+run can be replayed step by step when a classification looks wrong.
+
 The mail server is purely the transport layer underneath all of this — the
 pipeline talks to it over standard IMAP (read/move) and SMTP (send), the
 same way any email client would. Nothing about LangGraph/LangChain/Ollama

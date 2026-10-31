@@ -2,6 +2,11 @@ site_name: Email Automation Pipeline
 site_description: Local mail server + LangGraph/LangChain/Ollama pipeline for automated email triage
 repo_url: https://github.com/danielstet/EmailAutomationPipeline
 
+# Not a real page — just the source for the abbreviations glossary, appended
+# into every page via pymdownx.snippets below. Exclude it from the nav/search.
+exclude_docs: |
+  includes/
+
 theme:
   name: material
   palette:
@@ -12,11 +17,22 @@ theme:
     - navigation.sections
     - navigation.indexes
     - content.code.copy
+    - content.tooltips
 
 markdown_extensions:
   - admonition
+  - abbr
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.snippets:
+      base_path: docs/includes
+      check_paths: true
+      auto_append:
+        - abbreviations.md
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - tables
   - toc:
       permalink: true
