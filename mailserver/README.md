@@ -65,17 +65,16 @@ entry:
 
 ## Accounts
 
-All four share the password **`TestPass123!`** (local test server only —
-never reuse this anywhere real):
+Local test server only — never reuse this password anywhere real:
 
-| Address | Role |
-|---|---|
-| `inbox@localmail.test` | Triage inbox — where the pipeline reads incoming test mail |
-| `sales@localmail.test` | Fake department |
-| `support@localmail.test` | Fake department |
-| `billing@localmail.test` | Fake department |
-| `hr@localmail.test` | Fake department |
-| `marketing@localmail.test` | Fake department |
+| Address | Password | Role |
+|---|---|---|
+| `inbox@localmail.test` | `TestPass123!` | Triage inbox — where the pipeline reads incoming test mail |
+| `sales@localmail.test` | `TestPass123!` | Fake department |
+| `support@localmail.test` | `TestPass123!` | Fake department |
+| `billing@localmail.test` | `TestPass123!` | Fake department |
+| `hr@localmail.test` | `TestPass123!` | Fake department |
+| `marketing@localmail.test` | `TestPass123!` | Fake department |
 
 Add more: `docker exec mailserver setup email add newuser@localmail.test 'TestPass123!'`
 
@@ -92,6 +91,13 @@ the cert's hostname) with TLS peer verification disabled
 self-signed by our own throwaway local CA, not a publicly trusted one. Its
 own SQLite settings database lives in `docker-data/roundcube/db/`
 (gitignored — regenerates itself on first run, nothing to set up).
+
+**Logged into two accounts at once:** Roundcube ties your login to one
+session cookie per browser, so opening a second tab and logging into a
+different account breaks the first session with a CSRF "Request check
+failed" error. Open the second account in an Incognito/Private window
+instead (or a different browser/profile) — separate cookie jar, both stay
+logged in simultaneously.
 
 ## Ports
 
