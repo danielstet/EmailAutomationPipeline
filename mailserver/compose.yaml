@@ -1,0 +1,31 @@
+services:
+  mailserver:
+    image: ghcr.io/docker-mailserver/docker-mailserver:latest
+    container_name: mailserver
+    hostname: mail.localmail.test
+    env_file: mailserver.env
+    ports:
+      - "25:25"    # SMTP   (server-to-server, explicit TLS)
+      - "143:143"  # IMAP4  (explicit TLS => STARTTLS)
+      - "465:465"  # ESMTP  (implicit TLS submission)
+      - "587:587"  # ESMTP  (explicit TLS submission => STARTTLS)
+      - "993:993"  # IMAP4  (implicit TLS)
+    volumes:
+      # Bind-mounted inside the repo so mail data/config/certs are identical
+      # for everyone who clones this project — no external volume setup.
+      - ./docker-data/dms/mail-data/:/var/mail/
+      - ./docker-data/dms/mail-logs/:/var/log/mail/
+      - ./docker-data/dms/config/:/tmp/docker-mailserver/
+      - /etc/localtime:/etc/localtime:ro
+      # mail-state is Postfix's runtime queue/locks/sockets, not real mail
+      # data — it must be a Docker-managed volume, not a bind mount. On
+      # Docker Desktop for Mac, bind-mounting it breaks Postfix's private
+      # sockets ("chmod socket private/smtpd: Invalid argument") because
+      # Unix domain sockets don't survive the macOS<->Linux-VM filesystem
+      # bridge. See: docker-mailserver/docker-mailserver#3648
+      - mail-state:/var/mail-state/
+    restart: unless-stopped
+    stop_grace_period: 1m
+
+volumes:
+  mail-state:

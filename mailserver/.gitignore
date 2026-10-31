@@ -1,0 +1,9 @@
+# Real mail content and server logs — not meant to be shared via git.
+docker-data/dms/mail-data/
+docker-data/dms/mail-logs/
+
+# Private key material. Regenerate locally with generate-certs.sh (see README)
+# rather than committing keys to git, even for a throwaway test cert.
+docker-data/dms/config/ssl/
+docker-data/dms/custom-certs/*.pem
+docker-data/dms/custom-certs/demoCA/

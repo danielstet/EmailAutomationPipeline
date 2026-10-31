@@ -1,6 +1,0 @@
-# Each person's local mail data, admin credentials, and generated certs
-# shouldn't be shared via git — only the folder structure is tracked.
-data/etc/*
-data/data/*
-!data/etc/.gitkeep
-!data/data/.gitkeep
