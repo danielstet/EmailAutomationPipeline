@@ -122,6 +122,15 @@ before the next:
 
 ## How to run
 
+### Requirements
+
+| What | Why | Install |
+|---|---|---|
+| Python 3.11+ | App, pipeline, docs | `pip install -r requirements.txt` (Streamlit, LangGraph, LangChain, Ollama client, LangSmith, Langfuse, MkDocs Material) |
+| Docker (with Compose) | Mail server (docker-mailserver), webmail (Roundcube), TLS cert generation (`smallstep/step-ca`) | [Docker Desktop](https://www.docker.com/products/docker-desktop/) |
+| Ollama | Runs the local AI models | [ollama.com](https://ollama.com/), then `ollama pull <model>` |
+| Hosts-file entry | `mail.localmail.test` → `127.0.0.1` | See the full documentation |
+
 **The app (Streamlit dashboard, a placeholder for now):**
 
 ```bash
@@ -147,6 +156,8 @@ test accounts, the webmail UI and the pipeline architecture. To view it, run
 this from the repo root:
 
 ```bash
+mkdocs serve        # after pip install -r requirements.txt
+# or, with Docker only:
 docker run --rm -it -p 8000:8000 -v "${PWD}:/docs" squidfunk/mkdocs-material
 ```
 

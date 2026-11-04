@@ -1,2 +1,18 @@
+# Python dependencies only. Docker and Ollama are system tools: see
+# "Requirements" in README.md.
+
+# --- App (Streamlit dashboard) ---
 streamlit==1.66.*
 pandas==3.1.*
+
+# --- Automation pipeline ---
+langgraph==1.2.*
+langchain==1.4.*
+langchain-ollama==1.1.*
+langsmith==0.14.*
+langfuse==5.1.*
+
+# --- Documentation site (MkDocs) ---
+mkdocs==1.6.*
+mkdocs-material==9.8.*
+pymdown-extensions==12.3.*
