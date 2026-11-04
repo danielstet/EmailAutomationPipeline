@@ -3,3 +3,38 @@
 
 # macOS
 .DS_Store
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Secrets: API keys (LangSmith, Langfuse, ...), passwords, credentials
+.env
+.env.*
+!.env.example
+*.key
+secrets.toml
+.streamlit/secrets.toml
+kaggle.json
+
+# Large data files: download them, don't commit them (see data/README.md).
+# Small samples like data/sample_emails.csv stay committed.
+data/*
+!data/README.md
+!data/sample_*.csv
+*.zip
+*.eml
+*.mbox
+
+# Local model weights
+*.gguf

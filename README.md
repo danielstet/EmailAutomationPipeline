@@ -122,7 +122,14 @@ before the next:
 
 ## How to run
 
-The mail server is built and running. The pipeline itself is in progress.
+**The app (Streamlit dashboard, a placeholder for now):**
+
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+**The mail server** (the fake company's mail; the pipeline itself is in progress):
 
 ```bash
 cd mailserver

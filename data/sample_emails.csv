@@ -1,0 +1,8 @@
+from,to,date,subject,body,spam,department
+billing.client@acme-corp.test,inbox@localmail.test,2026-11-02 09:14,Invoice #4821 missing,"Hi, we haven't received last month's invoice. Can you resend it?",0,billing
+promo@cheap-deals.test,inbox@localmail.test,2026-11-02 09:31,YOU WON a FREE iPhone!!!,Click here to claim your prize now. Limited time offer!,1,
+jane.doe@prospect.test,inbox@localmail.test,2026-11-02 10:05,Pricing for 20 seats,We're interested in your product for our team of 20. What are the pricing options?,0,sales
+user42@customer.test,inbox@localmail.test,2026-11-02 10:47,Can't log in,"Since this morning I get an error when logging in. Please help, it's urgent.",0,support
+candidate@jobs.test,inbox@localmail.test,2026-11-02 11:20,Application - Backend Developer,"Attached is my CV for the backend developer position.",0,hr
+partner@agency.test,inbox@localmail.test,2026-11-02 12:02,Co-marketing webinar proposal,Would you like to co-host a webinar with us next month?,0,marketing
+noreply@newsletter.test,inbox@localmail.test,2026-11-02 12:30,,Weekly digest: 10 tools you should try,1,
