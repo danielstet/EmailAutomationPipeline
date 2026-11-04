@@ -28,6 +28,8 @@ markdown_extensions:
       check_paths: true
       auto_append:
         - abbreviations.md
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
