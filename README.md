@@ -4,10 +4,17 @@
 
 ## Project sentence
 
-Start-up companies spend their biggest budget item, people, on small,
-repetitive jobs that need constant human attention. We're building an
-automation system on LangGraph and LangChain that uses local AI models (Ollama)
-to take over those jobs, starting with a company's email.
+**Start-ups and small companies** suffer from **expensive employee time being
+spent on small, repetitive jobs like sorting, forwarding and answering email**,
+and we'll build **an AI automation system that filters, routes and responds to
+company email** using **local AI models (Ollama) orchestrated with LangGraph
+and LangChain**.
+
+## Target audience
+
+- **Who pays for it:** founders and managers of start-ups and small companies (roughly 5–50 employees). People are their biggest expense, and they can't afford staff whose day is spent on routine email work.
+- **Who uses it every day:** operations, support, sales, billing, HR and marketing employees who currently triage a shared inbox by hand. The system takes routine email off their plate and leaves them the complex cases.
+- **Why local models fit them:** these companies want automation without sending sensitive business email to external AI services or paying per-request API costs.
 
 ## The problem
 
