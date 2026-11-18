@@ -47,5 +47,6 @@ nav:
       - Architecture Notes: mail-server/architecture-notes.md
   - Data:
       - Combined Dataset: data/combined-dataset.md
+      - Data Preparation: data/data-preparation.md
   - Pipeline:
       - Overview: pipeline/overview.md
