@@ -14,11 +14,14 @@ message into the same fields: `from`, `to`, `date`, `subject`, `body`,
   |---|---|
   | `id` | Row number |
   | `source` | Which raw dataset the row came from |
-  | `from`, `to` | Sender (synthetic) and recipient (always `inbox@localmail.test`) |
+  | `from` | Made-up sender from one shared pool (`customer0000`–`0999@customer.test`), assigned at random so it doesn't hint at the source |
   | `subject`, `body` | Email text. The subject can be empty, as in real email |
   | `spam` | 1 = spam, 0 = not spam |
   | `department` | `billing`, `sales`, `support`, `hr`, `marketing`, `unclear`, or empty when the source has no reliable label |
   | `reply` | A reference reply written by a support agent (multi-lang tickets only) |
+
+  There is no `to` column: the recipient is always `inbox@localmail.test`,
+  set by the sending script. See `docs/data/combined-dataset.md`.
 
 - `department_histogram.png` shows the distribution of the target variable.
 - `sample_emails.csv` is a small hand-written sample used by `app.py` for a preview.

@@ -29,7 +29,10 @@ Kaggle datasets plus synthetic emails, sent into the mail server
   spam label. The customer-support-tickets dataset has random labels, so its
   text is used unlabelled.
 - Never commit real people's data: the two HR files (real addresses/LinkedIn)
-  stay local; senders in the committed dataset are synthetic.
+  stay local. `from` in the committed dataset is one shared made-up pool
+  (`customerNNNN@customer.test`, fixed seed), the same for every source so it
+  can't leak labels, and never `inbox@` (auto-replies would loop). No `to`
+  column: always `inbox@localmail.test`.
 - Known gaps: no marketing emails yet (synthetic later), `support` is 78% of
   labelled rows.
 

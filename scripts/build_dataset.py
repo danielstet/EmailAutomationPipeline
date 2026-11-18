@@ -9,12 +9,12 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 DATA = Path(__file__).resolve().parent.parent / "data"
 OUT_CSV = DATA / "emails_clean.csv"
 OUT_PNG = DATA / "department_histogram.png"
-INBOX = "inbox@localmail.test"
 
 DEPARTMENTS = ["billing", "sales", "support", "hr", "marketing", "unclear"]
 
@@ -32,7 +32,14 @@ QUEUE_TO_DEPARTMENT = {
     "General Inquiry": "unclear",
 }
 
-COLUMNS = ["id", "source", "from", "to", "subject", "body", "spam", "department", "reply"]
+# Senders come from ONE shared pool of made-up addresses, assigned at random
+# to every row whatever its source, so the sender never hints at the labels.
+# Fixed seed = the same CSV on every rebuild. No `to` column: it's always
+# inbox@localmail.test, set by the sending script.
+SENDER_POOL = [f"customer{i:04d}@customer.test" for i in range(1000)]
+SEED = 42
+
+COLUMNS = ["id", "source", "from", "subject", "body", "spam", "department", "reply"]
 
 
 def clean_text(s: pd.Series) -> pd.Series:
@@ -46,8 +53,6 @@ def load_tickets() -> pd.DataFrame:
     df = df[df["language"] == "en"].reset_index(drop=True)
     return pd.DataFrame({
         "source": "multilang_tickets",
-        # No sender in the dataset; use a synthetic address on a reserved .test domain.
-        "from": [f"customer{i:05d}@customer.test" for i in range(len(df))],
         "subject": clean_text(df["subject"]),
         "body": clean_text(df["body"]),
         "spam": 0,
@@ -61,7 +66,6 @@ def load_spam() -> pd.DataFrame:
     df = pd.read_csv(DATA / "spam_email_dataset.csv")
     return pd.DataFrame({
         "source": "spam_dataset",
-        "from": df["sender_email"],
         "subject": clean_text(df["subject"]),
         "body": clean_text(df["email_text"]),
         "spam": df["label"].astype(int),
@@ -80,7 +84,6 @@ def load_support() -> pd.DataFrame:
     ]
     return pd.DataFrame({
         "source": "support_tickets",
-        "from": df["Customer Email"],  # already @example.com in the dataset
         "subject": clean_text(df["Ticket Subject"]),
         "body": clean_text(pd.Series(body)),
         "spam": 0,
@@ -93,9 +96,10 @@ def build() -> pd.DataFrame:
     df = pd.concat([load_tickets(), load_spam(), load_support()], ignore_index=True)
     df = df[df["body"] != ""]
     df = df.drop_duplicates(subset=["subject", "body"]).reset_index(drop=True)
-    df["to"] = INBOX
     df["department"] = df["department"].fillna("")
     df["id"] = range(1, len(df) + 1)
+    rng = np.random.default_rng(SEED)
+    df["from"] = rng.choice(SENDER_POOL, size=len(df))
     return df[COLUMNS]
 
 
