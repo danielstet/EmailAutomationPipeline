@@ -3,6 +3,7 @@ Kaggle downloads in data/ (see data/README.md for where to get them).
 
 Run from the repo root:  python scripts/build_dataset.py
 """
+import re
 from pathlib import Path
 
 import matplotlib
@@ -42,6 +43,38 @@ SEED = 42
 COLUMNS = ["id", "source", "from", "subject", "body", "spam", "department", "reply"]
 
 
+# The support-tickets text was generated from templates and still has
+# ~300 different placeholder spellings ({product_purchased}, {Product_id},
+# {{item.price}}, {error_message}, ...).
+ERROR_MESSAGES = [
+    "Error 0x80070005: Access is denied",
+    "Unable to connect to the server. Please try again later",
+    "Unexpected error occurred (code 500)",
+    "Sync failed: invalid credentials",
+    "Device not recognized",
+    "Update failed with error code 1603",
+]
+# A template variable in single or double braces: a name, possibly with
+# spaces ({Product Name}), but no code punctuation like ; , " ( ).
+PLACEHOLDER = re.compile(r"\{\{?\s*\$?[A-Za-z_][\w.\-\[\]: ]*\}?\}")
+PRODUCT_WORDS = re.compile(r"product|purchas|item", re.IGNORECASE)
+
+
+def fill_placeholders(text: str, product: str, error: str) -> str:
+    """{error_message} -> a realistic error, product-like placeholders -> the
+    ticket's product, any other single-word placeholder -> removed. Code
+    fragments with spaces/semicolons are left as pasted-code noise."""
+    def sub(m: re.Match) -> str:
+        token = m.group(0)
+        if "error_message" in token:
+            return error
+        if PRODUCT_WORDS.search(token):
+            return product
+        return ""
+    text = PLACEHOLDER.sub(sub, text)
+    return re.sub(r"[ \t]{2,}", " ", text)
+
+
 def clean_text(s: pd.Series) -> pd.Series:
     """Turn literal '\\n' sequences into real newlines and trim whitespace."""
     return s.fillna("").astype(str).str.replace("\\n", "\n", regex=False).str.strip()
@@ -78,9 +111,11 @@ def load_support() -> pd.DataFrame:
     """Customer support tickets: text only. Their Ticket Type labels are random
     (independent of the ticket subject), so they are not used."""
     df = pd.read_csv(DATA / "customer_support_tickets.csv")
+    rng = np.random.default_rng(SEED)
+    errors = rng.choice(ERROR_MESSAGES, size=len(df))
     body = [
-        desc.replace("{product_purchased}", product)
-        for desc, product in zip(df["Ticket Description"], df["Product Purchased"])
+        fill_placeholders(desc, product, error)
+        for desc, product, error in zip(df["Ticket Description"], df["Product Purchased"], errors)
     ]
     return pd.DataFrame({
         "source": "support_tickets",

@@ -64,6 +64,11 @@ Never empty. Median 264 characters, longest 1,141. Sent as
 
 - **Anonymisation placeholders.** 607 ticket bodies contain tokens like
   `<name>`, `<tel_num>`, `<acc_num>`, left by the dataset author.
+- **Template placeholders (fixed).** The support tickets were generated
+  from templates with ~300 placeholder spellings (`{product_purchased}`,
+  `{Product_id}`, `{error_message}`…). The build script fills them with the
+  ticket's product or a realistic error message and removes the rest. 49
+  code-like fragments (`{ int i; }`) are left in as pasted-code noise.
 - **HTML fragments.** Some bodies contain `<br>`, `<p>`, `<div>`. They're
   sent as plain text, so they show up as literal tags. That's realistic mess,
   so we leave it.

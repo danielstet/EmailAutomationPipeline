@@ -89,7 +89,7 @@ is rebuilt with `python scripts/build_dataset.py`.
 ### 3 things we fixed, and why
 
 1. **Dropped the German rows (12,249 of 28,587 tickets).** Our fake company and our model prompts are in English, and mixing languages would make the comparison between Ollama models unfair.
-2. **Dropped the labels of the customer-support-tickets dataset.** Its `Ticket Type` doesn't depend on the ticket at all (a "billing inquiry" is as likely to be about a broken screen as anything else), so training on it would mean learning noise. We kept the text as unlabelled mail and filled in the `{product_purchased}` placeholder left in all 8,469 descriptions.
+2. **Dropped the labels of the customer-support-tickets dataset.** Its `Ticket Type` doesn't depend on the ticket at all (a "billing inquiry" is as likely to be about a broken screen as anything else), so training on it would mean learning noise. We kept the text as unlabelled mail and filled in the template placeholders it was generated from: `{product_purchased}` in every description, plus about 300 other spellings in 12% of them (`{Product_id}`, `{{item.price}}`, `{error_message}`…), replaced with the ticket's product or a realistic error message.
 3. **Kept real people's data out of the repo.** The two HR files contain only real addresses, names and LinkedIn URLs, and no email text. They stay local, and every sender in the public dataset is made up.
 
 ### Target variable: department
