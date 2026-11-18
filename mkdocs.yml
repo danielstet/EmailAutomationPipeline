@@ -45,5 +45,7 @@ nav:
       - Getting Started: mail-server/getting-started.md
       - Accounts & Webmail: mail-server/accounts-and-webmail.md
       - Architecture Notes: mail-server/architecture-notes.md
+  - Data:
+      - Combined Dataset: data/combined-dataset.md
   - Pipeline:
       - Overview: pipeline/overview.md
