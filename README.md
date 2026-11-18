@@ -70,12 +70,36 @@ Handling messy input (empty subjects, HTML-only bodies, attachment-only mail,
 forwarded threads) is part of what the system has to do.
 
 **Where the test email comes from:** we fill the fake company's mailboxes
-using public Kaggle datasets, which include spam, customer support tickets,
-HR emails, marketing and email tone. We send them into the mail server as real
-messages, together with synthetic emails generated for the fake company. The
-candidate datasets are listed here (still being checked; unsuitable ones will
-be removed):
-[Kaggle datasets for mail automation (Google Doc)](https://docs.google.com/document/d/1PUPexD2djFNNJ2YQwhDMbW08m1U5ldpLtCQqNLAMqP4/edit?usp=sharing)
+with public Kaggle datasets, which we send into the mail server as real
+messages, plus synthetic emails generated for the fake company. The cleaned
+dataset is in the repo: [`data/emails_clean.csv`](data/emails_clean.csv).
+Sources and download steps are in [`data/README.md`](data/README.md), and it
+is rebuilt with `python scripts/build_dataset.py`.
+
+### Data Card
+
+| Field | |
+|---|---|
+| **Source & license** | Three Kaggle datasets: [Customer IT Support tickets](https://www.kaggle.com/datasets/tobiasbueck/multilingual-customer-support-tickets) (synthetic), [Spam Email Detection](https://www.kaggle.com/datasets/ssssws/spam-email-detection-dataset-clean-and-ml-ready) and [Customer Support Ticket Dataset](https://www.kaggle.com/datasets/suraj520/customer-support-ticket-dataset) (CC0). Each license is on its Kaggle page. |
+| **Size** | 34,801 emails × 9 columns: 16,338 IT tickets, 10,000 spam-dataset emails, 8,463 support tickets |
+| **One row is** | One email arriving at `inbox@localmail.test`: sender, subject, body, labels, and an agent's reference reply where one exists |
+| **Target** | `department` (6 classes, labelled for the 16,338 IT tickets) and `spam` (0/1, 3,995 spam) |
+| **Limitations** | All text is synthetic or generated, not real company mail. `support` is 78% of the labelled rows and `marketing` has none yet. There are no real dates, HTML bodies or attachments. English only. |
+
+### 3 things we fixed, and why
+
+1. **Dropped the German rows (12,249 of 28,587 tickets).** Our fake company and our model prompts are in English, and mixing languages would make the comparison between Ollama models unfair.
+2. **Dropped the labels of the customer-support-tickets dataset.** Its `Ticket Type` doesn't depend on the ticket at all (a "billing inquiry" is as likely to be about a broken screen as anything else), so training on it would mean learning noise. We kept the text as unlabelled mail and filled in the `{product_purchased}` placeholder left in all 8,469 descriptions.
+3. **Kept real people's data out of the repo.** The two HR files contain only real addresses, names and LinkedIn URLs, and no email text. They stay local, and every sender in the public dataset is synthetic.
+
+### Target variable: department
+
+![Emails per department](data/department_histogram.png)
+
+The 10 ticket queues are mapped to our departments (for example Technical,
+Product and IT Support → `support`; Billing and Returns → `billing`; General
+Inquiry → `unclear`). The classes are very imbalanced, so we'll report
+per-department accuracy and not just overall accuracy.
 
 ## What the system shows
 

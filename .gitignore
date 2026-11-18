@@ -28,10 +28,12 @@ secrets.toml
 kaggle.json
 
 # Large data files: download them, don't commit them (see data/README.md).
-# Small samples like data/sample_emails.csv stay committed.
+# The cleaned dataset, its histogram and small samples stay committed.
 data/*
 !data/README.md
 !data/sample_*.csv
+!data/emails_clean.csv
+!data/department_histogram.png
 *.zip
 *.eml
 *.mbox

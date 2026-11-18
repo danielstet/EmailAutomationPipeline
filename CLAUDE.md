@@ -22,6 +22,17 @@ HTML-only bodies and attachment-only mail are expected. Test mail comes from
 Kaggle datasets plus synthetic emails, sent into the mail server
 (`data/README.md`).
 
+- `scripts/build_dataset.py` builds `data/emails_clean.csv` (committed) and
+  `data/department_histogram.png` from the raw Kaggle files (gitignored).
+- Department labels come only from the English multi-lang IT tickets (queue →
+  department mapping lives in the script). The spam dataset gives only the
+  spam label. The customer-support-tickets dataset has random labels, so its
+  text is used unlabelled.
+- Never commit real people's data: the two HR files (real addresses/LinkedIn)
+  stay local; senders in the committed dataset are synthetic.
+- Known gaps: no marketing emails yet (synthetic later), `support` is 78% of
+  labelled rows.
+
 ## What the model predicts
 For each email: **spam / not spam**, **department** (`billing`, `sales`,
 `support`, `hr`, `marketing`, `unclear`), and **action** (auto-reply,
@@ -30,7 +41,8 @@ forward, escalate).
 ## File structure
 - `README.md`: M1 project definition (keep it short; details go in `docs/`)
 - `app.py`: Streamlit app; `requirements.txt` has pinned versions
-- `data/`: data notes plus small samples; large downloads are gitignored
+- `data/`: data notes, the cleaned dataset and its histogram, small samples; raw Kaggle downloads are gitignored
+- `scripts/`: data preparation (`build_dataset.py`)
 - `mailserver/`: docker compose setup for the mail server; 6 test accounts (`inbox@`, `billing@`, `sales@`, `support@`, `hr@`, `marketing@` on `localmail.test`)
 - `docs/` + `mkdocs.yml`: MkDocs documentation site (mail server, pipeline architecture)
 
