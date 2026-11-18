@@ -4,7 +4,10 @@
 8 columns**, built by `scripts/build_dataset.py` from three Kaggle datasets
 (sources and cleaning steps are in `data/README.md` and the root README).
 
-Each row is one email that will be delivered to `inbox@localmail.test`. Some
+Each row is one email that will be delivered to `inbox@localmail.test`.
+Rows are **shuffled** (fixed seed), so neither the file order nor `id`
+reveals which dataset an email came from; any slice, like the first 500
+rows, has a realistic mix of tickets and spam. Some
 columns become parts of that email. Others are **ground truth**: they stay in
 the CSV and are only used to score the pipeline afterwards.
 

@@ -33,6 +33,8 @@ Kaggle datasets plus synthetic emails, sent into the mail server
   (`customerNNNN@customer.test`, fixed seed), the same for every source so it
   can't leak labels, and never `inbox@` (auto-replies would loop). No `to`
   column: always `inbox@localmail.test`.
+- Rows are shuffled with a fixed seed, so order and `id` don't reveal the
+  source; rebuilding gives a byte-identical CSV.
 - Known gaps: no marketing emails yet (synthetic later), `support` is 78% of
   labelled rows.
 

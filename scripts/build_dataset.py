@@ -97,8 +97,11 @@ def build() -> pd.DataFrame:
     df = df[df["body"] != ""]
     df = df.drop_duplicates(subset=["subject", "body"]).reset_index(drop=True)
     df["department"] = df["department"].fillna("")
-    df["id"] = range(1, len(df) + 1)
     rng = np.random.default_rng(SEED)
+    # Shuffle rows so neither file order nor id reveals the source (otherwise
+    # ids 1-16,338 would all be labelled tickets, then all the spam, ...).
+    df = df.iloc[rng.permutation(len(df))].reset_index(drop=True)
+    df["id"] = range(1, len(df) + 1)
     df["from"] = rng.choice(SENDER_POOL, size=len(df))
     return df[COLUMNS]
 
