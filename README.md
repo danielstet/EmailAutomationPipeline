@@ -196,12 +196,19 @@ before the next:
 | Ollama | Runs the local AI models | [ollama.com](https://ollama.com/), then `ollama pull <model>` |
 | Hosts-file entry | `mail.localmail.test` → `127.0.0.1` | See the full documentation |
 
-**The dashboard (Streamlit EDA on the cleaned data):**
+**The dashboard (Streamlit EDA on the cleaned data).** Only Python is needed;
+the data is already in the repo. Tested from a fresh virtual environment on
+Python 3.13 and 3.14:
 
 ```bash
+python -m venv .venv
+.venv\Scripts\activate          # Windows; on macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
 streamlit run app.py
 ```
+
+To rebuild the dataset from the raw Kaggle files (see `data/README.md`):
+`python scripts/build_dataset.py`.
 
 **The mail server** (the fake company's mail; the pipeline itself is in progress):
 
