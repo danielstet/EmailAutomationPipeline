@@ -83,7 +83,7 @@ from them is in the dataset. The zip is a duplicate of a file we already have.
 | 2 | `source` | string | `multilang_tickets`, `spam_dataset`, `support_tickets` | No |
 | 3 | `from` | string | `customer0000@customer.test` … `customer0999@customer.test` | No |
 | 4 | `subject` | string | Up to 234 characters, may contain emoji | Yes (2,607 rows) |
-| 5 | `body` | string (multi-line) | 6–1,141 characters | No |
+| 5 | `body` | string (multi-line) | 6–1,147 characters | No |
 | 6 | `spam` | integer | `0` or `1` | No |
 | 7 | `department` | string | `billing`, `sales`, `support`, `hr`, `unclear` (`marketing` defined but no rows yet) | Yes: empty = no reliable label |
 | 8 | `reply` | string (multi-line) | Agent's reference reply | Yes: only multilang tickets have one |

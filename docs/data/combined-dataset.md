@@ -59,7 +59,7 @@ real mail has empty subjects. **1,007 contain non-ASCII characters**
 encodes them automatically (RFC 2047), so they go through the server unchanged.
 
 ### `body`
-Never empty. Median 264 characters, longest 1,141. Sent as
+Never empty. Median 266 characters, longest 1,147. Sent as
 `text/plain; charset=utf-8`. Things to know:
 
 - **Anonymisation placeholders.** 607 ticket bodies contain tokens like
