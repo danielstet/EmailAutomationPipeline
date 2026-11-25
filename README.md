@@ -45,7 +45,7 @@ debugging and evaluation.
 **Dana, operations manager at a 20-person start-up.** Every morning the
 shared inbox has about 80 new emails. Before the system, two people spent half
 their day reading, forwarding and answering routine questions. Now, when Dana
-opens the dashboard, spam is already gone and department emails are already in
+opens the shared inbox, spam is already gone and department emails are already in
 the right mailboxes. Routine questions ("Where's my invoice?") have been
 answered. Dana only reviews the handful of emails the system flagged as
 unclear, and both people are free for work that actually needs them.
@@ -84,7 +84,7 @@ dataset is in the repo: [`data/emails_clean.csv`](data/emails_clean.csv)
 | **Source and link** | Three Kaggle datasets, all synthetic or generated text (no real company mail, no time period: the emails have no dates). [Customer IT Support - Ticket Dataset](https://www.kaggle.com/datasets/tobiasbueck/multilingual-customer-support-tickets) by Tobias Bueck (2024–2025, 16,338 rows used) gives the department labels. [Spam Email Detection Dataset](https://www.kaggle.com/datasets/ssssws/spam-email-detection-dataset-clean-and-ml-ready) by Thanh Nhan Nguyen (2026, 10,000 rows) gives the spam labels. [Customer Support Ticket Dataset](https://www.kaggle.com/datasets/suraj520/customer-support-ticket-dataset) by Suraj (2023, 8,463 rows) is unlabelled extra mail. |
 | **Size and format** | One CSV, 34,801 rows × 8 columns (`id`, `source`, `from`, `subject`, `body`, `spam`, `department`, `reply`), about 17 MB. Column reference: [Combined Dataset](docs/data/combined-dataset.md). |
 | **Target variable** | **`department`**: categorical, 6 classes (`billing`, `sales`, `support`, `hr`, `marketing`, `unclear`), labelled for 16,338 rows. **`spam`**: binary 0/1, all 34,801 rows (3,995 spam). |
-| **Missing values and problems** | Empty `subject` in 2,607 rows (kept), empty `department` in 18,463 rows (= no label, excluded from routing scores), empty `reply` outside the IT tickets. 6 duplicates removed. Some labels look wrong (e.g. integration questions labelled `billing`). Details in the cleaning table below. |
+| **Missing values and problems** | Empty `subject` in 2,607 rows (kept), empty `department` in 18,463 rows (= no label, excluded from routing scores), empty `reply` outside the IT tickets. 6 duplicates removed. 366 support-ticket bodies (1.1%) still contain cut-off generator fragments (kept, flagged). Some labels look wrong (e.g. integration questions labelled `billing`). Details in the cleaning table below. |
 | **License and bias** | CC BY 4.0 (IT tickets), CC BY-SA 4.0 (spam), CC0 (support tickets): use is allowed with attribution, and the spam rows must stay under CC BY-SA. **Not represented:** real company mail, languages other than English, HTML email and attachments, marketing email (0 rows). `support` is 78.5% of labelled rows, so small departments are under-represented. The spam text is random filler words and much easier to spot than real spam. |
 
 ### Cleaning decisions
@@ -97,7 +97,9 @@ dataset is in the repo: [`data/emails_clean.csv`](data/emails_clean.csv)
 | | No sender in the IT tickets | All senders replaced (see below) | |
 | **Duplicates** | 6 identical (subject, body) pairs | Removed | The same email shouldn't count twice |
 | **Column types** | `\n` stored as text in 740 bodies; labels as text/int | Converted to real newlines; `spam` and `id` are int, the rest strings | Emails must display correctly; labels must be comparable |
-| **Outliers** | Bodies from 6 to 1,147 characters; 97 under 30 chars ("Facing some problems"), 91 over 709 | Kept all | They are genuine short and long emails, not errors |
+| **Near duplicates** | 121 rows share a body with another row but have a different subject (generated support tickets) | Kept | Different emails that share a template sentence, like real customers |
+| **Wrong values** | 366 support-ticket bodies (1.1%) contain cut-off placeholders (`{product_p`) or pasted code/JSON from the dataset's generator | Kept and flagged | All in the unlabelled source, so no label is affected; real mail also has pasted junk. Revisit when synthetic mail replaces this source |
+| **Outliers** | Bodies from 6 to 1,141 characters; 97 under 30 chars ("Facing some problems"), 91 over 709 | Kept all | They are genuine short and long emails, not errors |
 | **Wrong language** | 12,249 German tickets | Removed | Company and prompts are English |
 | **Random labels** | `Ticket Type` in the support tickets doesn't depend on the text | Label dropped, text kept unlabelled | Training on it would mean learning noise |
 | **Template leftovers** | ~300 placeholder spellings (`{product_purchased}`, `{error_message}`…) in the support tickets | Filled with the ticket's product or a realistic error; others removed | Placeholders aren't real email text |
@@ -120,27 +122,44 @@ The 10 ticket queues are mapped to our departments (for example Technical,
 Product and IT Support → `support`; Billing and Returns → `billing`; General
 Inquiry → `unclear`).
 
-## Dashboard, insights and baseline
+**How the labels were made:** the department label is the original ticket
+queue, mapped by a fixed table in `scripts/build_dataset.py`. Both the ticket
+text and its queue come from a synthetic generator, and the EDA shows the text
+was likely written *from* the queue (billing words never appear outside
+billing). A model can partly learn the generator's word choice, so the scores
+on this data are an upper bound for real mail. The spam label comes from the
+spam dataset's own (synthetic) generator in the same way.
 
-![EDA dashboard](docs/images/dashboard.png)
+## EDA notebook, insight and baseline
 
-`streamlit run app.py` opens an EDA dashboard on the cleaned data: the
-insight at the top, 5 metrics (spam rate is the KPI the operations manager
-checks first), emails per department, body length of spam vs. real mail,
-sidebar filters (source, department, spam) and a sample table.
+[`eda.ipynb`](eda.ipynb) checks the cleaned data for signal with four
+questions (column types, data quality, distributions, correlation with a
+leakage check), with a written conclusion under every chart. The conclusions
+are also saved in [`docs/data/eda-conclusions.md`](docs/data/eda-conclusions.md).
 
-**What we learned from the data:**
-
-1. **We found that 78.5% of the labelled business email belongs to support.** A model that always answers "support" is already 78.5% accurate, so overall accuracy will flatter any model. What matters to the operations manager is routing the small departments (billing 15%, sales 3%, hr 2%) correctly, so we'll measure accuracy per department.
-2. **Spam is much shorter than real mail:** a median body of 131 characters vs. 287.
-3. **About 1 in 6 business emails has no subject** (16–21% depending on the department), so the model has to read the body, not just the subject line.
+**Insight:** **we found that 78.5% of the labelled business email belongs to
+support.** A model that always answers "support" is already 78.5% accurate, so
+overall accuracy will flatter any model. What matters to the operations manager
+is routing the small departments (billing 15%, sales 3%, hr 2%) correctly, so
+we'll measure accuracy per department and macro-F1.
 
 **Baselines (the numbers the M3 model has to beat):**
 
-| Task | Baseline | Accuracy |
-|---|---|---|
-| Department routing | Always predict the most common class, `support` | **78.5%** (on 16,338 labelled emails) |
-| Spam filter | Always predict "not spam" | **88.5%** (on 34,801 emails) |
+| Task (`y`) | Baseline | Accuracy | Macro-F1 |
+|---|---|---|---|
+| Department routing (`department`) | Always predict the most common class, `support` | **78.5%** (on 16,338 labelled emails) | 0.18 |
+| Spam filter (`spam`) | Always predict "not spam" | **88.5%** (on 34,801 emails) | 0.47 |
+
+**What else the notebook found:**
+
+1. **Spam is much shorter than real mail:** a median body of 131 characters vs. 285.
+2. **About 1 in 6 business emails has no subject** (16–21% per department), and length looks the same in every department, so the router has to read the body.
+3. **Leak: "!" in the subject has a 0.85 correlation with spam** (74% of spam, 0% of real mail). It's an artifact of the synthetic spam dataset, not a real rule, so we don't build on it, and spam accuracy on this data is optimistic.
+4. **Leak: `source` and `reply`** reveal whether a row can be spam or has a department. The model's only inputs are `subject` and `body`.
+5. **The department signal is in the words** ("billing" in 37% of billing mail, "employee" in 15% of hr mail). Billing words appear in exactly 0% of other mail, which suggests the text was generated from the label (see "How the labels were made" above), so billing routing will look easier here than on real mail.
+
+The Streamlit dashboard (`app.py`) from the first version of M2 is no longer
+part of the submission. It will come back when there is a model to show.
 
 ## What the system shows
 
@@ -191,20 +210,20 @@ before the next:
 
 | What | Why | Install |
 |---|---|---|
-| Python 3.11+ | App, pipeline, docs | `pip install -r requirements.txt` (Streamlit, LangGraph, LangChain, Ollama client, LangSmith, Langfuse, MkDocs Material) |
+| Python 3.11+ | EDA notebook, pipeline, docs | `pip install -r requirements.txt` (Jupyter, pandas, LangGraph, LangChain, Ollama client, LangSmith, Langfuse, MkDocs Material) |
 | Docker (with Compose) | Mail server (docker-mailserver), webmail (Roundcube), TLS cert generation (`smallstep/step-ca`) | [Docker Desktop](https://www.docker.com/products/docker-desktop/) |
 | Ollama | Runs the local AI models | [ollama.com](https://ollama.com/), then `ollama pull <model>` |
 | Hosts-file entry | `mail.localmail.test` → `127.0.0.1` | See the full documentation |
 
-**The dashboard (Streamlit EDA on the cleaned data).** Only Python is needed;
-the data is already in the repo. Tested from a fresh virtual environment on
-Python 3.13 and 3.14:
+**The EDA notebook.** Only Python is needed; the data is already in the
+repo. Tested from a fresh virtual environment on Python 3.14 with
+*Restart & Run All*:
 
 ```bash
 python -m venv .venv
 .venv\Scripts\activate          # Windows; on macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
-streamlit run app.py
+jupyter notebook eda.ipynb      # then Kernel → Restart & Run All
 ```
 
 To rebuild the dataset from the raw Kaggle files (see `data/README.md`):

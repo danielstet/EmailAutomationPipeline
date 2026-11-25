@@ -48,5 +48,6 @@ nav:
   - Data:
       - Combined Dataset: data/combined-dataset.md
       - Data Preparation: data/data-preparation.md
+      - EDA Conclusions: data/eda-conclusions.md
   - Pipeline:
       - Overview: pipeline/overview.md

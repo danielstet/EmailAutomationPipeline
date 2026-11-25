@@ -13,7 +13,8 @@ CS, both do all roles; work is split by timeline: data → automation → UI las
 - **Ollama** local models only, swappable and compared against each other
 - **LangSmith / Langfuse** for tracing every run
 - **docker-mailserver** (Postfix + Dovecot) as the fake company's mail server; Roundcube for viewing mailboxes
-- **Streamlit** (`app.py`): M2 EDA dashboard on `data/emails_clean.csv` (insight, metrics incl. baselines, 2 charts, sidebar filters, sample table)
+- **Jupyter** (`eda.ipynb`): the M2 deliverable, an EDA notebook on `data/emails_clean.csv` (four questions: column types, quality, distributions, correlation/leakage; a conclusion cell under every chart; insight + baselines at the top). Must pass Restart & Run All.
+- **Streamlit** (`app.py`): the earlier M2 dashboard, no longer required (course update 24/11); it returns once there's a model to show
 
 ## Data
 Unstructured email, not a fixed table. Each message is parsed into `from`,
@@ -48,11 +49,27 @@ Kaggle datasets plus synthetic emails, sent into the mail server
   in spam (74% of spam, 0% of other mail). That's an artifact of the synthetic
   source, not a real rule: don't build features or prompts around it, and
   don't trust spam accuracy on this data as a real-world estimate.
-- **Spam is shorter:** median body 131 chars vs. 287 for real mail.
+- **Spam is shorter:** median body 131 chars vs. 285 for real mail.
 - **~1 in 6 business emails has no subject** (16–21% per department), so
   routing must read the body.
 - **Labels are noisy:** spot checks found integration questions labelled
   `billing`. Review a sample before trusting them fully.
+- **Labels look generated from the text (or vice versa):** "billing",
+  "payment", "invoice", "subscription" appear in 0% of the 13,923 non-billing
+  emails. Billing routing will look easier here than on real mail; `sales` and
+  `unclear` have no marker words and are the hard classes.
+- **Leaks (never model inputs):** `source` and `reply` decide whether a row can
+  be spam / has a department; `id` and `from` are identifiers. Empty subjects
+  exist only in IT tickets, so "no subject" means "not spam" in this data only.
+  Model inputs are `subject` + `body` only.
+- **Surface features don't route:** length, digits and has-subject have
+  association < 0.1 with department; the signal is in the words.
+- **366 support-ticket bodies (1.1%) have cut-off generator fragments**
+  (`{product_p`, pasted code/JSON). Kept and flagged (unlabelled source); the
+  raw files aren't needed to see them, but fixing them in `build_dataset.py`
+  needs the raw Kaggle CSV.
+- Baseline macro-F1: 0.18 (department), 0.47 (spam).
+- Full EDA conclusions: `docs/data/eda-conclusions.md` (keep in sync with the notebook).
 - Licenses: CC BY 4.0 (IT tickets), CC BY-SA 4.0 (spam: keep share-alike),
   CC0 (support tickets).
 
@@ -63,7 +80,8 @@ forward, escalate).
 
 ## File structure
 - `README.md`: M1 project definition (keep it short; details go in `docs/`)
-- `app.py`: Streamlit app; `requirements.txt` has pinned versions
+- `eda.ipynb`: M2 EDA notebook (run from the repo root)
+- `app.py`: Streamlit dashboard (not part of M2 anymore); `requirements.txt` has pinned versions
 - `data/`: data notes, the cleaned dataset and its histogram, small samples; raw Kaggle downloads are gitignored
 - `scripts/`: data preparation (`build_dataset.py`)
 - `mailserver/`: docker compose setup for the mail server; 6 test accounts (`inbox@`, `billing@`, `sales@`, `support@`, `hr@`, `marketing@` on `localmail.test`)
