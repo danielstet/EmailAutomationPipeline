@@ -145,10 +145,13 @@ we'll measure accuracy per department and macro-F1.
 
 **Baselines (the numbers the M3 model has to beat):**
 
-| Task (`y`) | Baseline | Accuracy | Macro-F1 |
+| Target (`y`) | Baseline | Accuracy | Main metric (to beat) |
 |---|---|---|---|
-| Department routing (`department`) | Always predict the most common class, `support` | **78.5%** (on 16,338 labelled emails) | 0.18 |
-| Spam filter (`spam`) | Always predict "not spam" | **88.5%** (on 34,801 emails) | 0.47 |
+| `department` (16,338 labelled emails) | Always `support` | **78.5%** | macro-F1 **0.18** |
+| `spam` (34,801 emails) | Always "not spam" | **88.5%** | spam precision **27.9%** (rule: body under 200 chars = spam) |
+
+- **Department → macro-F1:** every department counts equally, so a model can't win by only getting `support` right.
+- **Spam → precision:** of the mail moved to spam, how much really was spam. "Always not spam" never flags anything, so its precision means nothing; the bar is the simplest rule from the EDA, "body under 200 characters = spam". It catches 99.5% of spam but 72% of what it flags is real mail. A real customer email lost in the spam folder is the costliest mistake, so the model has to beat 27.9% precision while still catching the spam.
 
 **What else the notebook found:**
 

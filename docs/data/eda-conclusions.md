@@ -12,15 +12,19 @@ accuracy flatters any model. For the operations manager the valuable part is
 routing the small departments (billing 15%, sales 3%, hr 2%) correctly, so M3 is
 scored per department and with macro-F1.
 
-| Target | Baseline | Accuracy | Macro-F1 |
+| Target | Baseline | Accuracy | Main metric (to beat) |
 |---|---|---|---|
-| `department` (16,338 labelled rows) | Always `support` | **78.5%** | 0.18 |
-| `spam` (34,801 rows) | Always "not spam" | **88.5%** | 0.47 |
+| `department` (16,338 labelled rows) | Always `support` | **78.5%** | macro-F1 **0.18** |
+| `spam` (34,801 rows) | Always "not spam" | **88.5%** | spam precision **27.9%** (rule: body under 200 chars = spam, catches 99.5% of spam) |
+
+Department → macro-F1 (every department counts equally). Spam → precision (a real
+email lost in the spam folder is the costliest mistake), The precision bar is a "body under 200
+characters = spam" rule (27.9%), since "always not spam" never flags anything.
 
 ## 1. Column types
 
 - Text: `subject`, `body`, `reply`. Targets: `spam` (binary), `department` (categorical, 6 classes, empty = no label).
-- Identifiers: `id`, and effectively `from` (1,000 random senders). `source` is categorical but describes where the row came from.
+- Identifiers: `id` and `from`. `from` is technically categorical (1,000 made-up addresses, 19–60 emails each) but assigned at random, so it says nothing about the email: treated as an ID. `source` is categorical but describes where the row came from.
 - **Model inputs are only `subject` and `body`.** `id`, `from`, `source` and `reply` are never inputs.
 - No dates, so there are no time columns.
 
@@ -47,6 +51,7 @@ scored per department and with macro-F1.
 - `body_length` ~ `body_words` = 0.98: redundant, keep one.
 - `id` ~ everything = 0.00: the shuffle works, row order leaks nothing.
 - **Leak: "!" in the subject has correlation 0.85 with spam** (74% of spam, 0% of real mail). Artifact of the synthetic spam data, so no features or prompts use it, and spam accuracy here is optimistic. `subject_upper_ratio` (0.56) is the same effect, weaker.
+- Same artifact: spam bodies **never contain a digit** (average 0.00 vs. 0.57 in real mail), and every spam email has a subject.
 - **Leak: `source` and `reply`** decide whether a row can be spam / has a department → never inputs.
 - **Department vs. surface features:** all associations < 0.1 (length, digits, has_subject); `from` 0.25 is chance from 1,000 categories. No leak, no signal.
 - **Signal is in the words:** "billing" in 37% of billing mail, "payment" 20%, "employee" 15% of hr mail.

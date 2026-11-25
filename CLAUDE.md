@@ -68,7 +68,7 @@ Kaggle datasets plus synthetic emails, sent into the mail server
   (`{product_p`, pasted code/JSON). Kept and flagged (unlabelled source); the
   raw files aren't needed to see them, but fixing them in `build_dataset.py`
   needs the raw Kaggle CSV.
-- Baseline macro-F1: 0.18 (department), 0.47 (spam).
+- Main metrics for M3: department → macro-F1 (baseline 0.18), spam → precision, beat 27.9% (rule "body under 200 chars = spam", catches 99.5% of spam; "always not spam" flags nothing so its precision is meaningless), accuracy above 88.5%.
 - Full EDA conclusions: `docs/data/eda-conclusions.md` (keep in sync with the notebook).
 - Licenses: CC BY 4.0 (IT tickets), CC BY-SA 4.0 (spam: keep share-alike),
   CC0 (support tickets).
