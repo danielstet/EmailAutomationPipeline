@@ -5,8 +5,9 @@ An AI automation system that takes over repetitive email work for a **fake
 company**. It filters spam, classifies each email and routes it to the right
 department, replies to or investigates what it can, and escalates the rest to
 a human. Target audience: start-ups and small companies that want to cut
-employee time spent on routine work. Team: Daniel Stetsyuk, Or Matsliah (both
-CS, both do all roles; work is split by timeline: data → automation → UI last).
+employee time spent on routine work. Team: Daniel Stetsyuk (Data, Developer),
+Or Matsliah (Product, UX / UI), both CS; work is split by timeline: data →
+automation → UI last.
 
 ## Stack
 - **LangGraph** (flow and routing between nodes) + **LangChain** (model calls)

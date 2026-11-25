@@ -196,12 +196,15 @@ For each incoming email (from its sender, subject and body):
 
 | Name | Faculty | Role |
 |---|---|---|
-| Daniel Stetsyuk | Computer Science | All roles: Product, Developer, Data, UX / UI |
-| Or Matsliah | Computer Science | All roles: Product, Developer, Data, UX / UI |
+| Daniel Stetsyuk | Computer Science | Data, Developer |
+| Or Matsliah | Computer Science | Product, UX / UI |
 
-We're a team of two, and we don't split the project by role. We both work
-on every part and divide the work **by timeline**, finishing each phase
-before the next:
+- **Data (Daniel):** collecting and cleaning the datasets, the EDA notebook, baselines.
+- **Developer (Daniel):** the mail server, the LangGraph / LangChain pipeline and the Ollama models.
+- **Product (Or):** the problem, the users and user stories, the success metrics and the pitch.
+- **UX / UI (Or):** how the system is presented: the webmail view, the dashboard and the demo.
+
+We divide the work **by timeline**, finishing each phase before the next:
 
 1. **Data:** build the fake company's email corpus from Kaggle and synthetic sources, and load it into the mail server.
 2. **Automation:** the LangGraph / LangChain pipeline (filter, classify, route, respond), local Ollama models, and LangSmith / Langfuse tracing.
